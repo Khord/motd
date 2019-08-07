@@ -1,0 +1,33 @@
+#!/bin/bash
+
+export TERM=xterm-256color
+
+upSeconds="$(/usr/bin/cut -d. -f1 /proc/uptime)"
+let secs=$((${upSeconds}%60))
+let mins=$((${upSeconds}/60%60))
+let hours=$((${upSeconds}/3600%24))
+let days=$((${upSeconds}/86400))
+UPTIME=$(printf "%d days, %02dh%02dm%02ds" "$days" "$hours" "$mins" "$secs")
+
+# get load averages
+read one five fifteen rest < /proc/loadavg
+
+echo "$(tput setaf 4)
+  ||                      @@@@@@$(tput setaf 2)    _    _       _ ______ _$(tput setaf 4)
+        ||              @@@@@@@@$(tput setaf 2)   | |  | |     (_)  ____(_)$(tput setaf 4)
+      ||               @@@@@@@@@$(tput setaf 2)   | |  | |_ __  _| |__   _ $(tput setaf 4)
+  ||      ||           @@@@@@@@@$(tput setaf 2)   | |  | | '_ \| |  __| | |$(tput setaf 4)
+  ||    ||             @@@@@@@@@$(tput setaf 2)   | |__| | | | | | |    | |$(tput setaf 4)  controller: $(service unifi status | awk '/Active/ {print $2}')
+  ||  ||               @@@@@@@@@$(tput setaf 2)    \____/|_| |_|_|_|    |_|$(tput setaf 4)  https://$(hostname):8443
+  ||      ||           @@@@@@@@@
+  ||  ||  ||           @@@@@@@@@$(tput setaf 1)   $(date +"%A, %e %B %Y, %r")$(tput setaf 4)
+  ||||||  ||           @@@@@@@@@$(tput setaf 1)   $(uname -srm)$(lsb_release -a 2>/dev/null | awk '/Description:/ {print " | "$2" "$3" "$4}')$(tput setaf 4)
+  ||||||||||           @@@@@@@@@$(tput setaf 3)   Uptime.............: ${UPTIME}$(tput setaf 4)
+  ||||||||||           @@@@@@@@/$(tput setaf 3)   CPU Load...........: ${one} | ${five} | ${fifteen}$(tput setaf 4)
+  ||||||||||           @@@@@@@//$(tput setaf 3)   Disk Space.........: $(df -h / | awk 'NR==2 { printf "Used: %sB, Free: %sB",$3,$4; }')$(tput setaf 4)
+  \|||||||||           @@@@@/// $(tput setaf 3)   Memory.............: $(free -m | awk 'NR==2 { printf "Used: %sMB, Free: %sMB",$3,$4; }')$(tput setaf 4)
+   \|||||||\          @@@@////  $(tput setaf 3)   Running Processes..: $(ps ax | wc -l | tr -d " ") | $(ps U unifi h | wc -l) belong to user: unifi$(tput setaf 4)
+    \|||||||\ (//////////////   $(tput setaf 3)   IP Addresses.......: $(hostname -I | awk '{print $1" | "$2}')$(tput setaf 4)
+      \||||||\ (///////////     $(tput setaf 3)   SSH Connections....: $(w -s | grep pts | wc -l) user(s) currently logged in$(tput setaf 4)
+        \|||||\ (////////       $(tput setaf 3)   Package Upgrades...: $(apt-get -s upgrade | awk '/^Inst/ {print $2}' | wc -l) upgrades are pending$(tput setaf 4)$(tput setaf 4)
+$(tput sgr0)"
