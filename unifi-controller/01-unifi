@@ -8,13 +8,14 @@ let mins=$((${upSeconds}/60%60))
 let hours=$((${upSeconds}/3600%24))
 let days=$((${upSeconds}/86400))
 UPTIME=$(printf "%d days, %02dh%02dm%02ds" "$days" "$hours" "$mins" "$secs")
+VERSION=$(apt-cache policy unifi | awk '/Installed:/ {print $2}' | cut -f1 -d "-")
 
 # get load averages
 read one five fifteen rest < /proc/loadavg
 
 echo "$(tput setaf 4)
   ||                      @@@@@@$(tput setaf 2)    _    _       _ ______ _$(tput setaf 4)
-        ||              @@@@@@@@$(tput setaf 2)   | |  | |     (_)  ____(_)$(tput setaf 4)
+        ||              @@@@@@@@$(tput setaf 2)   | |  | |     (_)  ____(_)$(tput setaf 4)  version: ${VERSION}
       ||               @@@@@@@@@$(tput setaf 2)   | |  | |_ __  _| |__   _ $(tput setaf 4)
   ||      ||           @@@@@@@@@$(tput setaf 2)   | |  | | '_ \| |  __| | |$(tput setaf 4)
   ||    ||             @@@@@@@@@$(tput setaf 2)   | |__| | | | | | |    | |$(tput setaf 4)  controller: $(service unifi status | awk '/Active/ {print $2}')
